@@ -1,0 +1,47 @@
+from sqlalchemy import Column, Integer, String, Date, ForeignKey, Table
+from sqlalchemy.orm import relationship
+
+from  db_connection import Base, engine
+
+
+book_authors = Table('book_authors', Base.metadata,
+    Column('book_id', ForeignKey('books.id'), primary_key=True),
+    Column('author_id', ForeignKey('authors.id'), primary_key=True)
+)
+
+book_categories = Table('book_categories', Base.metadata,
+    Column('book_id', ForeignKey('books.id'), primary_key=True),
+    Column('category_id', ForeignKey('categories.id'), primary_key=True)
+)
+
+class Book(Base):
+    __tablename__ = "books"
+
+    id = Column(Integer, primary_key=True, index=True)
+    title = Column(String, unique=True, index=True)
+    subtitle = Column(String)
+    authors = relationship("Author", secondary="book_authors", back_populates='books')
+    categories = relationship("Category", secondary="book_categories", back_populates="books")
+    published_date = Column(Date)
+    description = Column(String)
+    publisher = Column(String)
+
+
+class Author(Base):
+    __tablename__ = "authors"
+
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String, unique=True, index=True)
+    books = relationship("Book", secondary="book_authors", back_populates='authors')
+
+
+class Category(Base):
+    __tablename__ = "categories"
+
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String, unique=True, index=True)
+    books = relationship("Book", secondary="book_categories", back_populates="categories")
+
+
+# Create the tables in the database
+Base.metadata.create_all(engine)
