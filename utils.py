@@ -35,4 +35,35 @@ def serialize_from_db(books):
                 description=book.description
             )
             for book in books]
-    
+
+
+def serialize_from_openlibrary_api(books):
+    serialized_books = []
+    for book in books:
+        print(book["title"])
+        book_object = Book(
+            bookId=book["key"],
+            title=book["title"],
+            subtitle=book.get("subtitle", ""),
+            authors=book.get("author_name", []),
+            categories=book.get("subject", []),
+            publishedDate=book.get("first_publish_year", ""),
+            publisher=get_book_publisher(book),
+            description= get_book_description(book)
+        )
+        serialized_books.append(book_object)
+    return serialized_books
+
+
+def get_book_description(book):
+    description = ""
+    if "first_sentence" in book.keys():
+            description = " ".join(book["first_sentence"])
+    return description
+
+def get_book_publisher(book):
+    publisher = ""
+    if "publisher" in book.keys():
+        publisher = book["publisher"][0]
+    return publisher
+

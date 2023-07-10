@@ -6,8 +6,9 @@ from sqlalchemy.orm import Session
 from database.connection import get_db
 from database.operations import create_book, retrieve_books_from_db, delete_book_from_database
 from google_api.utilities import retrieve_books, build_query
+from openlibrary_api import utilities as openlibrary_utils
 from schemas import Book, InputBook, BookList, LookUpFilters
-from utils import serialize_books_output, serialize_from_db
+from utils import serialize_books_output, serialize_from_db, serialize_from_openlibrary_api
 
 
 app = FastAPI()
@@ -57,3 +58,11 @@ def delete_book(book_id: str, session: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail=value)
     else:
         raise HTTPException(status_code=409, detail=value)
+
+
+@app.get("/openlibrary/books", response_model=BookList)
+def get_books_from_openlibrary(keyword:str=None, author: str=None, title: str=None, publisher: str=None, category: str=None):
+    filters = LookUpFilters(keyword=keyword, author=author, title=title, publisher=publisher, category=category)
+    books = openlibrary_utils.retrieve_books(filters=filters)    
+    serialized_books = serialize_from_openlibrary_api(books)
+    return {"items": serialized_books, "source": "openlibrary" }

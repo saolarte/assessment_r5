@@ -19,7 +19,7 @@ class BaseBook(BaseModel):
         formats = ["%Y", "%Y-%m","%Y-%m-%d"]
         for format in formats:
             try:
-                date = datetime.strptime(value, format).date()
+                date = datetime.strptime(str(value), format).date()
                 return date
             except ValueError:
                 pass
