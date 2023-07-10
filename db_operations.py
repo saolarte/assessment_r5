@@ -3,10 +3,10 @@ from sqlalchemy.exc import IntegrityError, NoResultFound
 
 from models import Book, Author, Category
 from schemas import Book as BookSchema
-from schemas import LookUpFilters
+from schemas import InputBook, LookUpFilters
 
 
-def create_book(session: Session, input_book: BookSchema):
+def create_book(session: Session, input_book):
     serialized_input_book = input_book.model_dump(by_alias=True)
 
     authors = create_entities(Author, session, serialized_input_book["authors"])

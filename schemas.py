@@ -5,7 +5,7 @@ from pydantic import BaseModel, Field, validator
 
 
 
-class Book(BaseModel):
+class BaseBook(BaseModel):
     title: str
     subtitle: str
     authors: Union[None, List[str]] = None
@@ -28,6 +28,14 @@ class Book(BaseModel):
     class Config:
         from_attributes = True
         populate_by_name = True
+
+
+class InputBook(BaseBook):
+    bookId: Union[None, str] = Field(serialization_alias="book_id")
+
+class Book(BaseBook):
+    bookId: Union[None, str] = Field(validation_alias="book_id", serialization_alias="id")
+
 
 
 class BookList(BaseModel):

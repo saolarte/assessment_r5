@@ -2,9 +2,15 @@ from schemas import Book
 
 def serialize_books_output(source, books):
     if source=="google":
-        return [
+        return serialize_from_google_api(books)
+    elif source=="internal_db":
+        return serialize_from_db(books)
+
+
+def serialize_from_google_api(books):
+    return [
             Book(
-                id=book["id"],
+                bookId=book["id"],
                 title=book["volumeInfo"]["title"],
                 subtitle=book["volumeInfo"].get("subtitle", ""),
                 authors=book["volumeInfo"].get("authors", []),
@@ -14,10 +20,12 @@ def serialize_books_output(source, books):
                 description=book["volumeInfo"].get("description", "")
             )
             for book in books]
-    elif source=="internal_db":
-        return [
+
+
+def serialize_from_db(books):
+    return [
             Book(
-                id=book.id,
+                bookId=book.book_id,
                 title=book.title,
                 subtitle=book.subtitle,
                 authors=[author.name for author in book.authors],
@@ -27,4 +35,4 @@ def serialize_books_output(source, books):
                 description=book.description
             )
             for book in books]
-        
+    

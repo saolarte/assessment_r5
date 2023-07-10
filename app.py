@@ -6,8 +6,8 @@ from sqlalchemy.orm import Session
 from db_connection import get_db
 from db_operations import create_book, retrieve_books_from_db
 from google_api_utilities import retrieve_books, build_query
-from schemas import Book, BookList, LookUpFilters
-from utils import serialize_books_output
+from schemas import Book, InputBook, BookList, LookUpFilters
+from utils import serialize_books_output, serialize_from_db
 
 
 app = FastAPI()
@@ -39,10 +39,10 @@ async def list_books_handler(keyword:str=None, author: str=None, title: str=None
     return {"items": serialized_books, "source": source }
 
 
-@app.post("/book/", status_code=201)
-def create_book_handler(input_book: Book, session: Session = Depends(get_db)):
+@app.post("/book/", status_code=201, response_model=Book)
+def create_book_handler(input_book: InputBook, session: Session = Depends(get_db)):
     success, return_value = create_book(session=session, input_book=input_book)
     if success:
-        return return_value
+        return serialize_from_db([return_value])[0]
     else:
         raise HTTPException(status_code=409, detail=return_value)
