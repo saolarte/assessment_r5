@@ -18,6 +18,7 @@ class Book(Base):
     __tablename__ = "books"
 
     id = Column(Integer, primary_key=True, index=True)
+    book_id = Column(String, unique=True, index=True)
     title = Column(String, unique=True, index=True)
     subtitle = Column(String)
     authors = relationship("Author", secondary="book_authors", back_populates='books')
