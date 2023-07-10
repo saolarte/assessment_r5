@@ -4,7 +4,7 @@ from fastapi import Depends, FastAPI, HTTPException
 from sqlalchemy.orm import Session
 
 from db_connection import get_db
-from db_operations import create_book, retrieve_books_from_db
+from db_operations import create_book, retrieve_books_from_db, delete_book_from_database
 from google_api_utilities import retrieve_books, build_query
 from schemas import Book, InputBook, BookList, LookUpFilters
 from utils import serialize_books_output, serialize_from_db
@@ -46,3 +46,14 @@ def create_book_handler(input_book: InputBook, session: Session = Depends(get_db
         return serialize_from_db([return_value])[0]
     else:
         raise HTTPException(status_code=409, detail=return_value)
+
+
+@app.delete("/book/{book_id}")
+def delete_book(book_id: str, session: Session = Depends(get_db)):
+    result, value = delete_book_from_database(session=session, id=book_id)
+    if result:
+        return {"book_id": book_id}
+    elif result is None:
+        raise HTTPException(status_code=404, detail=value)
+    else:
+        raise HTTPException(status_code=409, detail=value)

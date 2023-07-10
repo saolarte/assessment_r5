@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Session
-from sqlalchemy.exc import IntegrityError, NoResultFound
+from sqlalchemy.exc import IntegrityError, NoResultFound, MultipleResultsFound
 
 from models import Book, Author, Category
 from schemas import Book as BookSchema
@@ -44,6 +44,26 @@ def retrieve_books_from_db(session: Session, filters: LookUpFilters):
     filters = build_filters(filters)
     books = session.query(Book).filter(*filters).all()
     return books
+
+
+def get_book(session: Session, book_id: str):
+    try:
+        book = session.query(Book).filter(Book.book_id == book_id).one()
+        return True, book
+    except MultipleResultsFound:
+        return False, f"Multiple books found with book_id: {book_id}"
+    except NoResultFound:
+        return None, f"No book found for book_id: {book_id}"
+
+
+def delete_book_from_database(session: Session, id: str):
+    exists, value = get_book(session, id)
+    if exists:
+        session.delete(value)
+        session.commit()
+        return True, id
+    else:
+        return exists, value
 
 
 def build_filters(filters):
