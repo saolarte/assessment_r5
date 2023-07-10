@@ -1,7 +1,7 @@
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError, NoResultFound, MultipleResultsFound
 
-from models import Book, Author, Category
+from database.models import Book, Author, Category
 from schemas import Book as BookSchema
 from schemas import InputBook, LookUpFilters
 

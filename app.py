@@ -3,9 +3,9 @@ from typing import Union, List
 from fastapi import Depends, FastAPI, HTTPException
 from sqlalchemy.orm import Session
 
-from db_connection import get_db
-from db_operations import create_book, retrieve_books_from_db, delete_book_from_database
-from google_api_utilities import retrieve_books, build_query
+from database.connection import get_db
+from database.operations import create_book, retrieve_books_from_db, delete_book_from_database
+from google_api.utilities import retrieve_books, build_query
 from schemas import Book, InputBook, BookList, LookUpFilters
 from utils import serialize_books_output, serialize_from_db
 

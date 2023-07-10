@@ -1,7 +1,7 @@
 from sqlalchemy import Column, Integer, String, Date, ForeignKey, Table
 from sqlalchemy.orm import relationship
 
-from  db_connection import Base, engine
+from  database.connection import Base, engine
 
 
 book_authors = Table('book_authors', Base.metadata,
