@@ -1,11 +1,13 @@
 from datetime import datetime, date
 from typing import List, Union
 from datetime import date
-from pydantic import BaseModel, Field, validator
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 
 
 class BaseBook(BaseModel):
+    model_config = ConfigDict(from_attributes = True, populate_by_name = True)
+    
     title: str
     subtitle: str
     authors: Union[None, List[str]] = None
@@ -14,7 +16,7 @@ class BaseBook(BaseModel):
     description: str
     publisher: str
 
-    @validator("publishedDate", pre=True)
+    @field_validator("publishedDate")
     def parse_published_date(cls, value):
         formats = ["%Y", "%Y-%m","%Y-%m-%d"]
         for format in formats:
@@ -23,11 +25,6 @@ class BaseBook(BaseModel):
                 return date
             except ValueError:
                 pass
-
-
-    class Config:
-        from_attributes = True
-        populate_by_name = True
 
 
 class InputBook(BaseBook):
