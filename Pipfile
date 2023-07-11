@@ -11,6 +11,8 @@ requests = "*"
 uvicorn = {version = "*", extras = ["standard"]}
 sqlalchemy = "*"
 psycopg2-binary = "*"
+pytest = "*"
+httpx = "*"
 
 [requires]
 python_version = "3.9"
