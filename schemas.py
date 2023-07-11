@@ -16,7 +16,7 @@ class BaseBook(BaseModel):
     description: str
     publisher: str
 
-    @field_validator("publishedDate")
+    @field_validator("publishedDate", mode="before")
     def parse_published_date(cls, value):
         formats = ["%Y", "%Y-%m","%Y-%m-%d"]
         for format in formats:
