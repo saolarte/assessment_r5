@@ -7,8 +7,9 @@ from sqlalchemy.orm import sessionmaker
 username = os.getenv("DB_USERNAME")
 password = os.getenv("DB_PASSWORD")
 db_name = os.getenv("DB_NAME")
+host = "database-1.czynyskp3eco.us-east-2.rds.amazonaws.com"
 
-SQLALCHEMY_DATABASE_URL = f"postgresql://{username}:{password}@localhost:5432/{db_name}"
+SQLALCHEMY_DATABASE_URL = f"postgresql://{username}:{password}@{host}/{db_name}"
 
 engine = create_engine(SQLALCHEMY_DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
