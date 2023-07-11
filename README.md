@@ -22,7 +22,7 @@ python run.py
 ```
 
 ### Make requests to the app
-Open API UI can be used to perform requests to the api. This is available at the following URL
+To perform requests to the api, Swagger UI can be used, which is available in the following URL
 ```
 http://localhost:8000/docs
 ```
