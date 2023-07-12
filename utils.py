@@ -43,7 +43,7 @@ def serialize_from_openlibrary_api(books):
     serialized_books = []
     for book in books:
         book_object = Book(
-            bookId=book["key"],
+            bookId=book["key"].split("/")[-1],
             title=book["title"],
             subtitle=book.get("subtitle", ""),
             authors=book.get("author_name", []),
