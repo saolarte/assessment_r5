@@ -3,7 +3,8 @@ import requests
 BASE_URL = "https://www.googleapis.com/books"
     
 
-def retrieve_books(query_parameters):
+def retrieve_books(filters):
+    query_parameters = build_query(filters)
     response = requests.get(f"{BASE_URL}/v1/volumes", params={ "q":query_parameters })
     if response.status_code == requests.codes.ok:
         return response.json()["items"]
