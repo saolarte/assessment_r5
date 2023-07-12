@@ -5,6 +5,7 @@ BASE_URL = "https://openlibrary.org"
 
 def retrieve_books(filters):
     params = create_query_parameters(filters)
+    params["limit"] = 10
     response = requests.get(f"{BASE_URL}/search.json", params=params)
     if response.status_code == requests.codes.ok:
         return response.json()["docs"]
