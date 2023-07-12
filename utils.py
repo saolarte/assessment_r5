@@ -5,6 +5,8 @@ def serialize_books_output(source, books):
         return serialize_from_google_api(books)
     elif source=="internal_db":
         return serialize_from_db(books)
+    elif source=="openlibrary":
+        return serialize_from_openlibrary_api(books)
 
 
 def serialize_from_google_api(books):
@@ -40,7 +42,6 @@ def serialize_from_db(books):
 def serialize_from_openlibrary_api(books):
     serialized_books = []
     for book in books:
-        print(book["title"])
         book_object = Book(
             bookId=book["key"],
             title=book["title"],

@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session
 
 from database.connection import get_db
 from database.operations import create_book, retrieve_books_from_db, delete_book_from_database
-from google_api.utilities import retrieve_books, build_query
+from google_api import utilities as googleapi_utilities
 from openlibrary_api import utilities as openlibrary_utils
 from schemas import Book, InputBook, BookList, LookUpFilters
 from utils import serialize_books_output, serialize_from_db, serialize_from_openlibrary_api
@@ -19,7 +19,12 @@ def read_root():
 
 
 @app.get("/books/", response_model=BookList)
-async def list_books_handler(keyword:str=None, author: str=None, title: str=None, publisher: str=None, category: str=None, session: Session = Depends(get_db)):
+async def list_books_handler(get_from: str="google", 
+                            keyword:str=None, 
+                            author: str=None, 
+                            title: str=None, 
+                            publisher: str=None, 
+                            category: str=None, session: Session = Depends(get_db)):
     output_books = None
     source = ""
 
@@ -28,20 +33,27 @@ async def list_books_handler(keyword:str=None, author: str=None, title: str=None
     if len(books) > 0:
         output_books = books
         source = "internal_db"
-    else:
-        query_parameters = build_query(filters)
+    elif get_from == "google": 
         try:
-            output_books = retrieve_books(query_parameters)
+            output_books = googleapi_utilities.retrieve_books(filters)
             source = "google"
         except Exception as e:
             print(e)
-        
+            raise HTTPException(status_code=500, detail=e)
+    elif get_from == "openlibrary":
+        try:            
+            output_books = openlibrary_utils.retrieve_books(filters=filters)
+            source = "openlibrary"
+        except Exception as e:
+            print(e)
+            raise HTTPException(status_code=500, detail=e)
+    
     serialized_books = serialize_books_output(source, output_books)
     return {"items": serialized_books, "source": source }
 
 
 @app.post("/book/", status_code=201, response_model=Book)
-def create_book_handler(input_book: InputBook, session: Session = Depends(get_db)):
+def create_book_handler(insert_parameters: InputBook, session: Session = Depends(get_db)):
     success, return_value = create_book(session=session, input_book=input_book)
     if success:
         return serialize_from_db([return_value])[0]
@@ -60,9 +72,4 @@ def delete_book(book_id: str, session: Session = Depends(get_db)):
         raise HTTPException(status_code=409, detail=value)
 
 
-@app.get("/openlibrary/books", response_model=BookList)
-def get_books_from_openlibrary(keyword:str=None, author: str=None, title: str=None, publisher: str=None, category: str=None):
-    filters = LookUpFilters(keyword=keyword, author=author, title=title, publisher=publisher, category=category)
-    books = openlibrary_utils.retrieve_books(filters=filters)    
-    serialized_books = serialize_from_openlibrary_api(books)
-    return {"items": serialized_books, "source": "openlibrary" }
+
