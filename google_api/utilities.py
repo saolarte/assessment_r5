@@ -7,7 +7,8 @@ def retrieve_books(filters):
     query_parameters = build_query(filters)
     response = requests.get(f"{BASE_URL}/v1/volumes", params={ "q":query_parameters })
     if response.status_code == requests.codes.ok:
-        return response.json()["items"]
+        
+        return response.json().get("items", [])
     else:
         raise Exception(f"There was a problem retrieving data: {response.content}")
 
