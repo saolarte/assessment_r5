@@ -12,6 +12,14 @@ def retrieve_books(filters):
         raise Exception(f"There was a problem retrieving data: {response.content}")
 
 
+def get_book(id):
+    response = requests.get(f"{BASE_URL}/v1/volumes/{id}")
+    if response.status_code == requests.codes.ok:
+        return response.json()
+    else:
+        raise Exception(f"There was a problem retrieving data: {response.content}")
+
+
 def build_query(filters):
     query_string = []
     if filters.keyword:

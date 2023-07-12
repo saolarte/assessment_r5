@@ -11,10 +11,13 @@ def create_book(session: Session, input_book):
 
     authors = create_entities(Author, session, serialized_input_book["authors"])
     categories = create_entities(Category, session, serialized_input_book["categories"])
+    book_id = serialized_input_book['id']
+
     del(serialized_input_book["authors"])
     del(serialized_input_book["categories"])
+    del(serialized_input_book["id"])
 
-    book = Book(**serialized_input_book, authors=authors, categories=categories)
+    book = Book(**serialized_input_book, book_id=book_id, authors=authors, categories=categories)
 
     session.add(book)
     try:
