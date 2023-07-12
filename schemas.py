@@ -41,8 +41,13 @@ class BookList(BaseModel):
 
 
 class LookUpFilters(BaseModel):
-    keyword: Union[str, None]
-    author: Union[str, None]
-    title: Union[str, None]
-    publisher: Union[str, None]
-    category: Union[str, None]
+    keyword: Union[str, None] = None
+    author: Union[str, None] = None
+    title: Union[str, None] = None
+    publisher: Union[str, None] = None
+    category: Union[str, None] = None
+
+
+class InsertParameters(BaseModel):
+    book_id: str
+    source: str
