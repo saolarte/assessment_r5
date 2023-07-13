@@ -6,11 +6,11 @@ from sqlalchemy.orm import Session
 from typing_extensions import Annotated
 
 from database.connection import get_db
-from database.operations import create_book, retrieve_books_from_db, delete_book_from_database
+from database.operations import create_book, delete_book_from_database
 from google_api import utilities as googleapi_utilities
 from openlibrary_api import utilities as openlibrary_utils
 from schemas import Book, InputBook, BookList, LookUpFilters, InsertParameters, User
-from utils import serialize_books_output, serialize_from_db, serialize_from_openlibrary_api
+from utils import get_books, serialize_books_output, serialize_from_db
 from api.security_utils import validate_token
 
 
@@ -25,34 +25,15 @@ async def list_books_handler(auth: Annotated[str, Depends(validate_token)],
                             title: str=None, 
                             publisher: str=None, 
                             category: str=None, session: Session = Depends(get_db)):
-    output_books = None
-    source = ""
-
-    filters = LookUpFilters(keyword=keyword, author=author, title=title, publisher=publisher, category=category)
-    books = retrieve_books_from_db(session=session, filters=filters)
-    if len(books) > 0:
-        output_books = books
-        source = "internal_db"
-    elif get_from == "google": 
-        try:
-            output_books = googleapi_utilities.retrieve_books(filters)
-            source = "google"
-        except Exception as e:
-            print(e)
-            raise HTTPException(status_code=500, detail=str(e))
-    elif get_from == "openlibrary":
-        try:            
-            output_books = openlibrary_utils.retrieve_books(filters=filters)
-            source = "openlibrary"
-        except Exception as e:
-            print(e)
-            raise HTTPException(status_code=500, detail=str(e))
-    else:
-            raise HTTPException(status_code=501, detail=f"source: {get_from} not supported")
+    filters = LookUpFilters(keyword=keyword, 
+                            author=author, 
+                            title=title, 
+                            publisher=publisher, 
+                            category=category)
+    source, books = get_books(session, filters, get_from)
 
     
-    serialized_books = serialize_books_output(source, output_books)
-    return {"items": serialized_books, "source": source }
+    return {"items": books, "source": source }
 
 
 @router.post("/book/", status_code=201, response_model=Book)
