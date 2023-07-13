@@ -47,3 +47,13 @@ The following is a sample query to retrieve books that match title and publisher
 }
 ```
 
+The following is a sample mutation that stores a new book to database, returning title and authors
+```
+mutation { book(bookId: "bookid", source: "openlibrary"){
+  title
+  authors
+  }
+}
+```
+
+
