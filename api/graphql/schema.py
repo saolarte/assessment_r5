@@ -26,3 +26,9 @@ class LookUpFilters:
     title: Union[str, None] = None
     publisher: Union[str, None] = None
     category: Union[str, None] = None
+
+
+@strawberry.type
+class InsertParameters:
+    book_id: str
+    source: str

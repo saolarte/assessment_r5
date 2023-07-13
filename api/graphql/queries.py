@@ -2,16 +2,14 @@ from typing import List
 import strawberry
 
 from .resolvers import get_books
-from .schema import Book, BookList
+from .schema import Book, BookList, InsertParameters
 from schemas import LookUpFilters
-
-
 
 
 @strawberry.type
 class Query:
     @strawberry.field
-    def books(get_from: str = "google",
+    def books(self, get_from: str = "google",
              keyword: str = None, 
               title: str = None, 
               author: str = None, 
@@ -25,4 +23,3 @@ class Query:
                                 )
         books, source = get_books(filters=filters, get_from=get_from)
         return BookList(items=books, source=source)
-        

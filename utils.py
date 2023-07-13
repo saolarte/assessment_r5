@@ -87,7 +87,7 @@ def get_books(session, filters, get_from):
             print(e)
             raise HTTPException(status_code=500, detail=str(e))
     elif get_from == "openlibrary":
-        try:            
+        try:         
             output_books = openlibrary_api_utilities.retrieve_books(filters=filters)
             source = "openlibrary"
         except Exception as e:
