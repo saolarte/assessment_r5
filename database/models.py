@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Date, ForeignKey, Table
+from sqlalchemy import Column, Integer, String, Date, ForeignKey, Table, Boolean
 from sqlalchemy.orm import relationship
 
 from  database.connection import Base, engine
@@ -43,6 +43,13 @@ class Category(Base):
     name = Column(String, unique=True, index=True)
     books = relationship("Book", secondary="book_categories", back_populates="categories")
 
+
+class User(Base):
+    __tablename__ = "users"
+    id = Column(Integer, primary_key=True, index=True)
+    username = Column(String, unique=True)
+    password = Column(String)
+    active = Column(Boolean)
 
 # Create the tables in the database
 Base.metadata.create_all(engine)
