@@ -13,6 +13,9 @@ sqlalchemy = "*"
 psycopg2-binary = "*"
 pytest = "*"
 httpx = "*"
+python-multipart = "*"
+python-jose = {version = "*", extras = ["cryptography"]}
+passlib = {version = "*", extras = ["bcrypt"]}
 
 [requires]
 python_version = "3.9"
