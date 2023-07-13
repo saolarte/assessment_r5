@@ -21,9 +21,29 @@ python -m pytest
 python run.py
 ```
 
-### Make requests to the app
+### Make REST requests to the app
 To perform requests to the api, Swagger UI can be used, which is available in the following URL
 ```
 http://localhost:8000/docs
+```
+
+### Make GraphQL requests to the app
+Go to 
+```
+http://localhost:8000/graphql
+```
+
+The following is a sample query to retrieve books that match title and publisher
+```
+{
+  books(title: "sample title", publisher: "sample publisher") {
+    items {
+      title
+      publisher
+      
+    }
+    source
+  }
+}
 ```
 
