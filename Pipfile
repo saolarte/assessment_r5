@@ -16,6 +16,7 @@ httpx = "*"
 python-multipart = "*"
 python-jose = {version = "*", extras = ["cryptography"]}
 passlib = {version = "*", extras = ["bcrypt"]}
+strawberry-graphql = "*"
 
 [requires]
 python_version = "3.9"
