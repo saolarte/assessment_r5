@@ -6,11 +6,11 @@ from sqlalchemy.orm import Session
 from typing_extensions import Annotated
 
 from database.connection import get_db
-from database.operations import create_book, delete_book_from_database
+from database.operations import delete_book_from_database
 from google_api import utilities as googleapi_utilities
 from openlibrary_api import utilities as openlibrary_utils
 from schemas import Book, InputBook, BookList, LookUpFilters, InsertParameters, User
-from utils import get_books, serialize_books_output, serialize_from_db
+from utils import get_books, store_book, serialize_books_output, serialize_from_db
 from api.security_utils import validate_token
 
 
@@ -37,25 +37,10 @@ async def list_books_handler(auth: Annotated[str, Depends(validate_token)],
 
 
 @router.post("/book/", status_code=201, response_model=Book)
-def create_book_handler(auth: Annotated[str, Depends(validate_token)], insert_parameters: InsertParameters, session: Session = Depends(get_db)):
-    if insert_parameters.source == "openlibrary":
-        try:
-            filters = LookUpFilters(keyword=insert_parameters.book_id)
-            book = openlibrary_utils.get_book(filters)
-        except Exception as e:
-            print(e)
-            raise HTTPException(status_code=500, detail=str(e))
-    elif insert_parameters.source == "google":
-        try:
-            book = googleapi_utilities.get_book(insert_parameters.book_id)
-        except Exception as e:
-            print(e)
-            raise HTTPException(status_code=500, detail=str(e))
-    else:
-        raise HTTPException(status_code=501, detail=f"source: {insert_parameters.source} not supported")
-    
-    serialized_book = serialize_books_output(insert_parameters.source, [book])[0]
-    success, return_value = create_book(session=session, input_book=serialized_book)
+def create_book_handler(auth: Annotated[str, Depends(validate_token)], 
+                        insert_parameters: InsertParameters, 
+                        session: Session = Depends(get_db)):
+    success, return_value = store_book(insert_parameters, session)
     if success:
         return serialize_from_db([return_value])[0]
     else:

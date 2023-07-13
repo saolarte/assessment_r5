@@ -1,7 +1,7 @@
 from fastapi import HTTPException
 
-from schemas import Book
-from database.operations import retrieve_books_from_db
+from schemas import Book, LookUpFilters
+from database.operations import retrieve_books_from_db, create_book
 import google_api.utilities as googleapi_utilities
 import openlibrary_api.utilities as openlibrary_api_utilities
 
@@ -97,3 +97,26 @@ def get_books(session, filters, get_from):
             raise HTTPException(status_code=501, detail=f"source: {get_from} not supported")
     serialized_books = serialize_books_output(source, output_books)
     return source, serialized_books
+
+
+def store_book(insert_parameters, session):
+    if insert_parameters.source == "openlibrary":
+        try:
+            filters = LookUpFilters(keyword=insert_parameters.book_id)
+            book = openlibrary_api_utilities.get_book(filters)
+        except Exception as e:
+            print(e)
+            raise HTTPException(status_code=500, detail=str(e))
+        if not book:
+                raise HTTPException(status_code=404, detail=f"id: {filters.keyword} not found in {insert_parameters.source}")
+    elif insert_parameters.source == "google":
+        try:
+            book = googleapi_utilities.get_book(insert_parameters.book_id)
+        except Exception as e:
+            print(e)
+            raise HTTPException(status_code=500, detail=str(e))
+    else:
+        raise HTTPException(status_code=501, detail=f"source: {insert_parameters.source} not supported")
+    
+    serialized_book = serialize_books_output(insert_parameters.source, [book])[0]
+    return create_book(session=session, input_book=serialized_book)
